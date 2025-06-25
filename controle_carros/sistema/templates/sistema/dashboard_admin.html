@@ -1,0 +1,64 @@
+{% extends 'sistema/base.html' %}
+{% block title %}Painel Administrativo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="dashboard-header">
+    <h2><i class='bx bxs-dashboard me-2'></i>Painel Administrativo</h2>
+    <p class="text-muted">Gerencie usuários, carros, viagens e serviços do sistema</p>
+  </div>
+
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <h3><i class='bx bxs-user-account me-2'></i>Usuários</h3>
+      <p class="number">{{ usuarios.count }}</p>
+      <p class="text-muted">Usuários cadastrados</p>
+    </div>
+    <div class="stat-card">
+      <h3><i class='bx bxs-car me-2'></i>Carros</h3>
+      <p class="number">{{ carros.count }}</p>
+      <p class="text-muted">Carros registrados</p>
+    </div>
+    <div class="stat-card">
+      <h3><i class='bx bxs-map me-2'></i>Viagens</h3>
+      <p class="number">{{ viagens.count }}</p>
+      <p class="text-muted">Viagens realizadas</p>
+    </div>
+    <div class="stat-card">
+      <h3><i class='bx bxs-cog me-2'></i>Serviços</h3>
+      <p class="number">{{ servicos.count }}</p>
+      <p class="text-muted">Serviços registrados</p>
+    </div>
+  </div>
+  
+  <ul class="nav nav-tabs mt-4" id="adminTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab" aria-controls="usuarios" aria-selected="true">Usuários</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="carros-tab" data-bs-toggle="tab" data-bs-target="#carros" type="button" role="tab" aria-controls="carros" aria-selected="false">Carros</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="viagens-tab" data-bs-toggle="tab" data-bs-target="#viagens" type="button" role="tab" aria-controls="viagens" aria-selected="false">Viagens</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="servicos-tab" data-bs-toggle="tab" data-bs-target="#servicos" type="button" role="tab" aria-controls="servicos" aria-selected="false">Serviços</button>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-3" id="adminTabContent">
+    <div class="tab-pane fade show active" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
+      {% include 'sistema/abas/usuarios.html' %}
+    </div>
+    <div class="tab-pane fade" id="carros" role="tabpanel" aria-labelledby="carros-tab">
+      {% include 'sistema/abas/carros.html' %}
+    </div>
+    <div class="tab-pane fade" id="viagens" role="tabpanel" aria-labelledby="viagens-tab">
+      {% include 'sistema/abas/viagens.html' %}
+    </div>
+    <div class="tab-pane fade" id="servicos" role="tabpanel" aria-labelledby="servicos-tab">
+      {% include 'sistema/abas/servicos.html' %}
+    </div>
+  </div>
+</div>
+{% endblock %}

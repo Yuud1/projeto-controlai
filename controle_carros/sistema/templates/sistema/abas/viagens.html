@@ -1,0 +1,189 @@
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class='bx bx-trip me-2'></i>Gerenciamento de Viagens</h2>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#novaViagemModal">
+            <i class='bx bx-plus-circle me-2'></i>Nova Viagem
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Motorista</th>
+                    <th>Veículo</th>
+                    <th>Destino</th>
+                    <th>Data de Saída</th>
+                    <th>Data de Retorno</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for viagem in viagens %}
+                <tr>
+                    <td>{{ viagem.motorista.nome }}</td>
+                    <td>{{ viagem.veiculo.nome }}</td>
+                    <td>{{ viagem.destino }}</td>
+                    <td>{{ viagem.data_saida|date:"d/m/Y H:i" }}</td>
+                    <td>{{ viagem.data_retorno|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% if viagem.status == 'AGENDADA' %}
+                        <span class="badge bg-warning">Agendada</span>
+                        {% elif viagem.status == 'EM_ANDAMENTO' %}
+                        <span class="badge bg-primary">Em Andamento</span>
+                        {% elif viagem.status == 'CONCLUIDA' %}
+                        <span class="badge bg-success">Concluída</span>
+                        {% elif viagem.status == 'CANCELADA' %}
+                        <span class="badge bg-danger">Cancelada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editarViagem{{ viagem.id }}">
+                            <i class='bx bx-edit-alt'></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#excluirViagem{{ viagem.id }}">
+                            <i class='bx bx-trash'></i>
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- Modal de Edição -->
+                <div class="modal fade" id="editarViagem{{ viagem.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Editar Viagem</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="{% url 'editar_viagem' viagem.id %}" method="post">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Motorista</label>
+                                        <select class="form-select" name="motorista" required>
+                                            {% for motorista in motoristas %}
+                                            <option value="{{ motorista.id }}" {% if motorista.id == viagem.motorista.id %}selected{% endif %}>
+                                                {{ motorista.nome }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Veículo</label>
+                                        <select class="form-select" name="veiculo" required>
+                                            {% for veiculo in veiculos %}
+                                            <option value="{{ veiculo.id }}" {% if veiculo.id == viagem.veiculo.id %}selected{% endif %}>
+                                                {{ veiculo.nome }} - {{ veiculo.placa }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Destino</label>
+                                        <input type="text" class="form-control" name="destino" value="{{ viagem.destino }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Data de Saída</label>
+                                        <input type="datetime-local" class="form-control" name="data_saida" value="{{ viagem.data_saida|date:'Y-m-d\TH:i' }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Data de Retorno</label>
+                                        <input type="datetime-local" class="form-control" name="data_retorno" value="{{ viagem.data_retorno|date:'Y-m-d\TH:i' }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Status</label>
+                                        <select class="form-select" name="status" required>
+                                            <option value="AGENDADA" {% if viagem.status == 'AGENDADA' %}selected{% endif %}>Agendada</option>
+                                            <option value="EM_ANDAMENTO" {% if viagem.status == 'EM_ANDAMENTO' %}selected{% endif %}>Em Andamento</option>
+                                            <option value="CONCLUIDA" {% if viagem.status == 'CONCLUIDA' %}selected{% endif %}>Concluída</option>
+                                            <option value="CANCELADA" {% if viagem.status == 'CANCELADA' %}selected{% endif %}>Cancelada</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de Exclusão -->
+                <div class="modal fade" id="excluirViagem{{ viagem.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirmar Exclusão</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Tem certeza que deseja excluir a viagem para "{{ viagem.destino }}"?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <form action="{% url 'excluir_viagem' viagem.id %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal de Nova Viagem -->
+<div class="modal fade" id="novaViagemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nova Viagem</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'nova_viagem' %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Motorista</label>
+                        <select class="form-select" name="motorista" required>
+                            <option value="">Selecione um motorista</option>
+                            {% for motorista in motoristas %}
+                            <option value="{{ motorista.id }}">{{ motorista.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Veículo</label>
+                        <select class="form-select" name="veiculo" required>
+                            <option value="">Selecione um veículo</option>
+                            {% for veiculo in veiculos %}
+                            <option value="{{ veiculo.id }}">{{ veiculo.nome }} - {{ veiculo.placa }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Destino</label>
+                        <input type="text" class="form-control" name="destino" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data de Saída</label>
+                        <input type="datetime-local" class="form-control" name="data_saida" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data de Retorno</label>
+                        <input type="datetime-local" class="form-control" name="data_retorno" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Criar Viagem</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
